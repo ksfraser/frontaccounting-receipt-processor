@@ -1,0 +1,25 @@
+{
+  "database": {
+    "host": "production-db-host",
+    "port": 5432,
+    "username": "prod_user",
+    "password": "prod_password",
+    "database": "prod_database"
+  },
+  "api": {
+    "baseUrl": "https://api.production.example.com",
+    "timeout": 5000
+  },
+  "logging": {
+    "level": "info",
+    "file": "/var/log/frontaccounting-receipt-processor.log"
+  },
+  "ocr": {
+    "tesseractPath": "/usr/local/bin/tesseract",
+    "language": "eng"
+  },
+  "features": {
+    "enableBudgetAutomation": true,
+    "trackUsage": true
+  }
+}

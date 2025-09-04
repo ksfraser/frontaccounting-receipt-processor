@@ -1,0 +1,29 @@
+{
+  "port": 3000,
+  "faBaseUrl": "http://localhost:8080/api",
+  "faApiKey": "changeme"
+}
+    "host": "localhost",
+    "port": 5432,
+    "username": "dev_user",
+    "password": "dev_password",
+    "database": "receipt_processor_dev"
+  },
+  "ocr": {
+    "tesseractPath": "/usr/local/bin/tesseract",
+    "language": "eng"
+  },
+  "logging": {
+    "level": "debug",
+    "file": "logs/development.log"
+  },
+  "frontAccounting": {
+    "apiUrl": "http://localhost:8000/api",
+    "apiKey": "your_api_key_here"
+  },
+  "features": {
+    "autoBudget": false,
+    "trackUsage": true,
+    "trackPrices": true
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "appName": "Front Accounting Receipt Processor",
+  "version": "1.0.0",
+  "description": "A project for processing PDF and JPG receipts into Supplier invoices in Front Accounting.",
+  "defaultCurrency": "USD",
+  "ocr": {
+    "provider": "tesseract",
+    "language": "eng"
+  },
+  "ingestion": {
+    "watchDirectory": "./receipts",
+    "supportedFormats": ["pdf", "jpg", "jpeg"]
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "username": "user",
+    "password": "password",
+    "databaseName": "receipt_processor"
+  },
+  "logging": {
+    "level": "info",
+    "logFile": "./logs/app.log"
+  },
+  "budget": {
+    "enabled": true,
+    "threshold": 1000
+  },
+  "api": {
+    "baseUrl": "http://localhost:3000/api",
+    "timeout": 5000
+  }
+}
