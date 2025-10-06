@@ -20,8 +20,8 @@ The Front Accounting Receipt Processor is designed to automate the conversion of
   - **ItemMapper**: Maps item data from the parsed receipt to the application's item model.
 
 ### 4. Normalization
-- **Currency**: Functions for normalizing various currency formats found in receipts.
-- **Units**: Functions for normalizing measurement units to ensure consistency across the application.
+- **Currency**: Provides methods for normalizing various currency formats found in receipts.
+- **Units**: Provides methods for normalizing measurement units to ensure consistency across the application.
 
 ### 5. Suppliers
 - **SupplierService**: Manages supplier data, including creation, updates, and retrieval of supplier information.

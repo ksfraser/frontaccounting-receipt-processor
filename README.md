@@ -20,30 +20,27 @@ This project is designed to process PDF and JPG receipts into supplier invoices 
 ```
 frontaccounting-receipt-processor
 ├── src
-│   ├── ingestion
-│   ├── ocr
-│   ├── parsing
-│   ├── suppliers
-│   ├── items
-│   ├── pricing
-│   ├── usage
-│   ├── invoices
-│   ├── budget
-│   ├── integrations
-│   ├── storage
-│   ├── utils
-│   └── types
+│   ├── Ingestion
+│   ├── OCR
+│   ├── Parsing
+│   ├── Suppliers
+│   ├── Items
+│   ├── Pricing
+│   ├── Usage
+│   ├── Invoices
+│   ├── Budget
+│   ├── Integrations
+│   ├── Storage
+│   ├── Utils
+│   └── Normalization
 ├── tests
 ├── scripts
 ├── docs
 ├── config
 ├── Dockerfile
 ├── docker-compose.yml
-├── package.json
-├── tsconfig.json
-├── jest.config.js
-├── .eslintrc.json
-├── .prettierrc
+├── composer.json
+├── phpunit.xml
 ├── .env.example
 ├── README.md
 └── LICENSE
@@ -63,14 +60,14 @@ frontaccounting-receipt-processor
 
 3. Install dependencies:
    ```
-   npm install
+   composer install
    ```
 
 4. Configure environment variables by copying `.env.example` to `.env` and updating the values.
 
 5. Start the application:
    ```
-   npm start
+   php artisan serve
    ```
 
 ## Contributing
