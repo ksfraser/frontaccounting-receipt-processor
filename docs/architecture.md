@@ -6,7 +6,7 @@ The Front Accounting Receipt Processor is designed to automate the conversion of
 ## Components
 
 ### 1. Ingestion
-- **FileWatcher**: Monitors a specified directory for new receipt files (PDF and JPG) and triggers processing when new files are detected.
+- **FileWatcher**: Monitors a specified directory for new receipt files (PDF, JPG, PNG) and triggers processing when new files are detected. It integrates with the `OcrService` for text extraction and the `ReceiptParser` for data processing.
 - **UploadHandler**: Manages the uploading of receipts and initiates the processing workflow.
 
 ### 2. Optical Character Recognition (OCR)

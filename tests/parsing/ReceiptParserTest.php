@@ -3,6 +3,8 @@
 namespace Tests\Parsing;
 
 use App\Parsing\ReceiptParser;
+use App\Parsing\ParsedReceipt;
+use App\Parsing\ParsedItem;
 use PHPUnit\Framework\TestCase;
 
 class ReceiptParserTest extends TestCase
@@ -16,32 +18,40 @@ class ReceiptParserTest extends TestCase
 
     public function testParseValidReceipt(): void
     {
-        $ocrOutput = "Supplier: ABC Corp\nDate: 2025-10-05\nItems:\n- Item 1: $10.00\n- Item 2: $20.00";
-        $result = $this->parser->parse($ocrOutput);
+        $ocrOutput = "Supplier: ABC Corp\nDate: 2025-10-05\nItems:\n- Item A: $10.00\n- Item B: $20.00";
 
-        $this->assertEquals('ABC Corp', $result['supplier']['name']);
-        $this->assertEquals('2025-10-05', $result['date']);
-        $this->assertCount(2, $result['items']);
-        $this->assertEquals(30.0, $result['totalAmount']);
+        $parsedReceipt = $this->parser->parse($ocrOutput);
+
+        $this->assertInstanceOf(ParsedReceipt::class, $parsedReceipt);
+        $this->assertEquals('2025-10-05', $parsedReceipt->date);
+        $this->assertCount(2, $parsedReceipt->items);
+        $this->assertEquals(30.0, $parsedReceipt->totalAmount);
+
+        $itemA = $parsedReceipt->items[0];
+        $this->assertInstanceOf(ParsedItem::class, $itemA);
+        $this->assertEquals('Item A', $itemA->description);
+        $this->assertEquals(10.0, $itemA->unitPrice);
+
+        $itemB = $parsedReceipt->items[1];
+        $this->assertEquals('Item B', $itemB->description);
+        $this->assertEquals(20.0, $itemB->unitPrice);
     }
 
     public function testParseEmptyReceipt(): void
     {
-        $ocrOutput = "";
-        $result = $this->parser->parse($ocrOutput);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('OCR output is empty');
 
-        $this->assertEquals('', $result['supplier']['name']);
-        $this->assertEquals('', $result['date']);
-        $this->assertCount(0, $result['items']);
-        $this->assertEquals(0.0, $result['totalAmount']);
+        $this->parser->parse("");
     }
 
-    public function testParseInvalidReceipt(): void
+    public function testParseInvalidFormat(): void
     {
+        $ocrOutput = "Invalid receipt format";
+
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid receipt format');
 
-        $ocrOutput = "Invalid data";
         $this->parser->parse($ocrOutput);
     }
 }

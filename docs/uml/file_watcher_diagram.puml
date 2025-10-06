@@ -1,0 +1,14 @@
+@startuml
+
+class FileWatcher {
+    - OcrService $ocrService
+    - ReceiptParser $receiptParser
+    - string $receiptsDir
+    + __construct(string $receiptsDir, OcrService $ocrService, ReceiptParser $receiptParser)
+    + start(): void
+}
+
+FileWatcher --> OcrService
+FileWatcher --> ReceiptParser
+
+@enduml

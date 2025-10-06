@@ -38,10 +38,7 @@ class UsageTracker
             $this->usageData[$itemId]['count'] += 1;
             $this->usageData[$itemId]['lastUsed'] = $currentDate;
         } else {
-            $this->usageData[$itemId] = [
-                'count' => 1,
-                'lastUsed' => $currentDate
-            ];
+            $this->usageData[$itemId] = ['count' => 1, 'lastUsed' => $currentDate];
         }
     }
 
@@ -62,13 +59,10 @@ class UsageTracker
 
     public function getUsageData(): array
     {
-        $usageData = [];
+        $snapshot = [];
         foreach ($this->usageData as $itemId => $data) {
-            $usageData[] = [
-                'itemId' => $itemId,
-                'quantity' => $data['count']
-            ];
+            $snapshot[] = ['itemId' => $itemId, 'quantity' => $data['count']];
         }
-        return $usageData;
+        return $snapshot;
     }
 }

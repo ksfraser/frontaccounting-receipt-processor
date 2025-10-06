@@ -2,23 +2,35 @@
 
 namespace App\Parsing;
 
-class ReceiptParser
-{
-    public function parse(string $ocrOutput): array
-    {
+class ParsedSupplier {
+    public string $id;
+    public string $name;
+    public string $contactInfo;
+}
+
+class ParsedItem {
+    public string $id;
+    public string $description;
+    public float $quantity;
+    public float $unitPrice;
+    public float $totalPrice;
+}
+
+class ParsedReceipt {
+    public string $id;
+    public string $supplierId;
+    public string $date;
+    public float $totalAmount;
+    public string $currency;
+    /** @var ParsedItem[] */
+    public array $items;
+}
+
+class ReceiptParser {
+    public function parse(string $ocrOutput): ParsedReceipt {
         $normalized = trim($ocrOutput);
         if (empty($normalized)) {
-            return [
-                'supplier' => [
-                    'id' => 1,
-                    'name' => '',
-                    'address' => '',
-                    'contactInfo' => ''
-                ],
-                'date' => '',
-                'items' => [],
-                'totalAmount' => 0
-            ];
+            throw new \Exception('OCR output is empty');
         }
 
         preg_match('/Supplier:\s*(.+)/i', $normalized, $supplierMatch);
@@ -29,38 +41,31 @@ class ReceiptParser
             throw new \Exception('Invalid receipt format');
         }
 
-        $supplier = [
-            'id' => 1,
-            'name' => trim($supplierMatch[1]),
-            'address' => '123 Main St',
-            'contactInfo' => 'info@abc.com'
-        ];
+        $parsedReceipt = new ParsedReceipt();
+        $parsedReceipt->id = uniqid();
+        $parsedReceipt->supplierId = 'example-supplier-id';
+        $parsedReceipt->date = $dateMatch[1];
+        $parsedReceipt->totalAmount = 0.0;
+        $parsedReceipt->currency = 'USD';
+        $parsedReceipt->items = [];
 
         $itemsRaw = preg_split('/\r?\n/', $itemsSectionMatch[1]);
-        $items = [];
         foreach ($itemsRaw as $idx => $line) {
             $line = trim($line);
             if (strpos($line, '-') === 0) {
                 if (preg_match('/-\s*(.+?):\s*\$?(\d+\.?\d*)/', $line, $m)) {
-                    $items[] = [
-                        'id' => $idx + 1,
-                        'name' => trim($m[1]),
-                        'quantity' => 1,
-                        'price' => (float)$m[2]
-                    ];
+                    $item = new ParsedItem();
+                    $item->id = (string)($idx + 1);
+                    $item->description = trim($m[1]);
+                    $item->quantity = 1;
+                    $item->unitPrice = (float)$m[2];
+                    $item->totalPrice = $item->unitPrice * $item->quantity;
+                    $parsedReceipt->items[] = $item;
+                    $parsedReceipt->totalAmount += $item->totalPrice;
                 }
             }
         }
 
-        $totalAmount = array_reduce($items, function ($sum, $item) {
-            return $sum + $item['price'] * $item['quantity'];
-        }, 0);
-
-        return [
-            'supplier' => $supplier,
-            'date' => $dateMatch[1],
-            'items' => $items,
-            'totalAmount' => $totalAmount
-        ];
+        return $parsedReceipt;
     }
 }

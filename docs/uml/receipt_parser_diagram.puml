@@ -1,0 +1,33 @@
+@startuml
+
+class ParsedSupplier {
+    +string $id
+    +string $name
+    +string $contactInfo
+}
+
+class ParsedItem {
+    +string $id
+    +string $description
+    +float $quantity
+    +float $unitPrice
+    +float $totalPrice
+}
+
+class ParsedReceipt {
+    +string $id
+    +string $supplierId
+    +string $date
+    +float $totalAmount
+    +string $currency
+    +ParsedItem[] $items
+}
+
+class ReceiptParser {
+    +parse(string $ocrOutput): ParsedReceipt
+}
+
+ParsedReceipt "1" *-- "*" ParsedItem
+ReceiptParser --> ParsedReceipt
+
+@enduml
