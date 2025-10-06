@@ -1,0 +1,22 @@
+@startuml
+
+interface OcrProviderInterface {
+    + recognize(filePath: string): string
+}
+
+class OcrService {
+    - OcrProviderInterface provider
+    + __construct(provider: OcrProviderInterface)
+    + processReceipt(filePath: string): string
+    - processImage(imagePath: string): string
+    - processPdf(pdfPath: string): string
+}
+
+class TesseractProvider {
+    + recognize(filePath: string): string
+}
+
+OcrService --> OcrProviderInterface
+TesseractProvider ..|> OcrProviderInterface
+
+@enduml

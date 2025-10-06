@@ -1,15 +1,6 @@
-    // Attach a file to an invoice (if FA API supports file uploads)
-    public async attachFileToInvoice(invoiceId: string | number, filePath: string) {
-        const url = `${this.baseUrl}/invoices/${invoiceId}/attachments`;
-        const headers = {
-            'Authorization': `Bearer ${this.apiKey}`
-        };
-        const formData = new FormData();
-        formData.append('file', fs.createReadStream(filePath));
-        const response = await axios.post(url, formData, { headers });
-        return response.data;
-    }
 import axios from 'axios';
+import fs from 'fs';
+import FormData from 'form-data';
 
 class FaClient {
     private baseUrl: string;
@@ -55,6 +46,18 @@ class FaClient {
 
     public async getItemPrices(itemId: string) {
         return this.request('GET', `items/${itemId}/prices`);
+    }
+
+    // Attach a file to an invoice (if FA API supports file uploads)
+    public async attachFileToInvoice(invoiceId: string | number, filePath: string) {
+        const url = `${this.baseUrl}/invoices/${invoiceId}/attachments`;
+        const headers = {
+            'Authorization': `Bearer ${this.apiKey}`
+        };
+        const formData = new FormData();
+        formData.append('file', fs.createReadStream(filePath));
+        const response = await axios.post(url, formData, { headers });
+        return response.data;
     }
 }
 

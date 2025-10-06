@@ -32,3 +32,24 @@ export class OcrError extends AppError {
         this.name = "OcrError";
     }
 }
+
+export class FileUploadError extends AppError {
+    constructor(message: string) {
+        super(message);
+        this.name = "FileUploadError";
+    }
+}
+
+export class ApiError extends AppError {
+    constructor(message: string) {
+        super(message);
+        this.name = "ApiError";
+    }
+}
+
+export class ParsingError extends AppError {
+    constructor(message: string) {
+        super(message);
+        this.name = "ParsingError";
+    }
+}

@@ -3,11 +3,15 @@ import path from 'path';
 import fs from 'fs';
 import { OcrError } from '../utils/errors';
 
-export class OcrService {
-    private provider: TesseractProvider;
+export interface OcrProvider {
+    recognize(filePath: string): Promise<string>;
+}
 
-    constructor(provider?: TesseractProvider) {
-        this.provider = provider || new TesseractProvider();
+export class OcrService {
+    private provider: OcrProvider;
+
+    constructor(provider: OcrProvider) {
+        this.provider = provider;
     }
 
     /**
@@ -38,7 +42,6 @@ export class OcrService {
     }
 
     private async processPdf(pdfPath: string): Promise<string> {
-        // Placeholder: convert PDF to images then run OCR. For now, attempt direct recognition (tesseract can sometimes handle PDFs)
         try {
             return await this.provider.recognize(pdfPath);
         } catch (error: any) {
@@ -47,7 +50,7 @@ export class OcrService {
     }
 }
 
-export class TesseractProvider {
+export class TesseractProvider implements OcrProvider {
     public async recognize(filePath: string): Promise<string> {
         const { data: { text } } = await Tesseract.recognize(filePath, 'eng');
         return text;
