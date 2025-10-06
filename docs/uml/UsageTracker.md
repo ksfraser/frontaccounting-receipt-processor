@@ -1,0 +1,15 @@
+# UsageTracker Class Diagram
+
+```plantuml
+@startuml
+class UsageTracker {
+    - array $usageData
+    + __construct()
+    + trackUsage(string $itemId): void
+    + getUsage(string $itemId): ?array
+    + getAllUsage(): array
+    + clearUsage(string $itemId): void
+    + getUsageData(): array
+}
+@enduml
+```
