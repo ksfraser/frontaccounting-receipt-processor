@@ -24,9 +24,9 @@ class SupplierServiceTest extends TestCase
         $this->assertSame($supplier, $this->supplierService->getSupplier('1'));
     }
 
-    public function testAddDuplicateSupplier(): void
+    public function testAddSupplierThrowsExceptionIfExists(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Supplier already exists');
 
         $supplier = new Supplier('1', 'Supplier A');
@@ -45,13 +45,37 @@ class SupplierServiceTest extends TestCase
         $this->assertSame($updatedSupplier, $this->supplierService->getSupplier('1'));
     }
 
-    public function testUpdateNonExistentSupplier(): void
+    public function testUpdateSupplierThrowsExceptionIfNotExists(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Supplier does not exist');
 
         $supplier = new Supplier('1', 'Supplier A');
         $this->supplierService->updateSupplier($supplier);
+    }
+
+    public function testGetSupplier(): void
+    {
+        $supplier = new Supplier('1', 'Supplier A');
+        $this->supplierService->addSupplier($supplier);
+
+        $this->assertSame($supplier, $this->supplierService->getSupplier('1'));
+    }
+
+    public function testGetSupplierReturnsNullIfNotExists(): void
+    {
+        $this->assertNull($this->supplierService->getSupplier('1'));
+    }
+
+    public function testGetAllSuppliers(): void
+    {
+        $supplier1 = new Supplier('1', 'Supplier A');
+        $supplier2 = new Supplier('2', 'Supplier B');
+
+        $this->supplierService->addSupplier($supplier1);
+        $this->supplierService->addSupplier($supplier2);
+
+        $this->assertEquals([$supplier1, $supplier2], $this->supplierService->getAllSuppliers());
     }
 
     public function testRemoveSupplier(): void
@@ -63,26 +87,11 @@ class SupplierServiceTest extends TestCase
         $this->assertNull($this->supplierService->getSupplier('1'));
     }
 
-    public function testRemoveNonExistentSupplier(): void
+    public function testRemoveSupplierThrowsExceptionIfNotExists(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Supplier does not exist');
 
         $this->supplierService->removeSupplier('1');
-    }
-
-    public function testGetAllSuppliers(): void
-    {
-        $supplier1 = new Supplier('1', 'Supplier A');
-        $supplier2 = new Supplier('2', 'Supplier B');
-
-        $this->supplierService->addSupplier($supplier1);
-        $this->supplierService->addSupplier($supplier2);
-
-        $allSuppliers = $this->supplierService->getAllSuppliers();
-
-        $this->assertCount(2, $allSuppliers);
-        $this->assertContains($supplier1, $allSuppliers);
-        $this->assertContains($supplier2, $allSuppliers);
     }
 }

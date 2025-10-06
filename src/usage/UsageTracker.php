@@ -59,10 +59,8 @@ class UsageTracker
 
     public function getUsageData(): array
     {
-        $snapshot = [];
-        foreach ($this->usageData as $itemId => $data) {
-            $snapshot[] = ['itemId' => $itemId, 'quantity' => $data['count']];
-        }
-        return $snapshot;
+        return array_map(function ($itemId, $data) {
+            return ['itemId' => $itemId, 'quantity' => $data['count']];
+        }, array_keys($this->usageData), $this->usageData);
     }
 }

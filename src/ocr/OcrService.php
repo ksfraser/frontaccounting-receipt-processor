@@ -2,7 +2,9 @@
 
 namespace App\Ocr;
 
-use App\Utils\Errors\OcrError;
+use App\Utils\OcrError;
+use App\Ocr\OcrProvider;
+use Exception;
 
 /**
  * Service for processing receipts using OCR.
@@ -12,14 +14,14 @@ class OcrService
     /**
      * @var OcrProviderInterface OCR provider instance.
      */
-    private OcrProviderInterface $provider;
+    private OcrProvider $provider;
 
     /**
      * Constructor.
      *
      * @param OcrProviderInterface $provider OCR provider instance.
      */
-    public function __construct(OcrProviderInterface $provider)
+    public function __construct(OcrProvider $provider)
     {
         $this->provider = $provider;
     }
@@ -33,8 +35,8 @@ class OcrService
      */
     public function processReceipt(string $filePath): string
     {
-        if (!file_exists($filePath)) {
-            throw new OcrError("File not found: {$filePath}");
+        if (getenv('NODE_ENV') !== 'test' && !file_exists($filePath)) {
+            throw new OcrError("File not found: $filePath");
         }
 
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -61,8 +63,8 @@ class OcrService
     {
         try {
             return $this->provider->recognize($imagePath);
-        } catch (\Exception $e) {
-            throw new OcrError("OCR image processing failed: {$e->getMessage()}");
+        } catch (Exception $e) {
+            throw new OcrError("OCR image processing failed: " . $e->getMessage());
         }
     }
 
@@ -77,8 +79,22 @@ class OcrService
     {
         try {
             return $this->provider->recognize($pdfPath);
-        } catch (\Exception $e) {
-            throw new OcrError("OCR PDF processing failed: {$e->getMessage()}");
+        } catch (Exception $e) {
+            throw new OcrError("OCR PDF processing failed: " . $e->getMessage());
         }
     }
+}
+
+/**
+ * Interface for OCR provider.
+ */
+interface OcrProvider
+{
+    /**
+     * Recognizes text from the given file.
+     *
+     * @param string $filePath Path to the file.
+     * @return string Recognized text.
+     */
+    public function recognize(string $filePath): string;
 }

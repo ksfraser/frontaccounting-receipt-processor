@@ -1,0 +1,20 @@
+@startuml
+
+class SupplierService {
+    - suppliers : array
+    + __construct() : void
+    + addSupplier(Supplier) : void
+    + updateSupplier(Supplier) : void
+    + getSupplier(string) : ?Supplier
+    + getAllSuppliers() : array
+    + removeSupplier(string) : void
+}
+
+class Supplier {
+    + getId() : string
+    + getName() : string
+}
+
+SupplierService o-- Supplier
+
+@enduml

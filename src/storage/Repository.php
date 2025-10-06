@@ -2,6 +2,11 @@
 
 namespace App\Storage;
 
+use App\Models\Item;
+use App\Models\Supplier;
+use App\Models\Invoice;
+use App\Models\PricePoint;
+
 class Repository
 {
     private array $items = [];
@@ -88,66 +93,5 @@ class Repository
             }
         }
         return $result;
-    }
-}
-
-// Define the Item, Supplier, Invoice, and PricePoint classes for completeness.
-class Item
-{
-    private string $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-}
-
-class Supplier
-{
-    private string $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-}
-
-class Invoice
-{
-    private string $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-}
-
-class PricePoint
-{
-    private string $itemId;
-
-    public function __construct(string $itemId)
-    {
-        $this->itemId = $itemId;
-    }
-
-    public function getItemId(): string
-    {
-        return $this->itemId;
     }
 }

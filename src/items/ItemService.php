@@ -2,7 +2,7 @@
 
 namespace App\Items;
 
-use App\Utils\Errors\AppError;
+use InvalidArgumentException;
 
 class ItemService
 {
@@ -16,7 +16,7 @@ class ItemService
     public function createItem(string $id, string $name, float $price): void
     {
         if (isset($this->items[$id])) {
-            throw new AppError('Item already exists');
+            throw new InvalidArgumentException('Item already exists');
         }
         $this->items[$id] = ['name' => $name, 'price' => $price, 'usage' => 0];
     }
@@ -24,7 +24,7 @@ class ItemService
     public function updateItem(string $id, ?string $name = null, ?float $price = null): void
     {
         if (!isset($this->items[$id])) {
-            throw new AppError('Item not found');
+            throw new InvalidArgumentException('Item not found');
         }
         if ($name !== null) {
             $this->items[$id]['name'] = $name;
@@ -42,7 +42,7 @@ class ItemService
     public function trackUsage(string $id, int $quantity): void
     {
         if (!isset($this->items[$id])) {
-            throw new AppError('Item not found');
+            throw new InvalidArgumentException('Item not found');
         }
         $this->items[$id]['usage'] += $quantity;
     }

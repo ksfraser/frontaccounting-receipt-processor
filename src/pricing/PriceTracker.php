@@ -26,13 +26,13 @@ class PriceTracker
 
     public function getCurrentPrice(string $itemId): ?float
     {
-        $prices = $this->getPriceHistory($itemId);
+        $prices = $this->priceHistory[$itemId] ?? null;
         return $prices ? end($prices) : null;
     }
 
     public function getAveragePrice(string $itemId): ?float
     {
-        $prices = $this->getPriceHistory($itemId);
+        $prices = $this->priceHistory[$itemId] ?? null;
         if (!$prices || count($prices) === 0) {
             return null;
         }
@@ -56,7 +56,7 @@ class PriceTracker
     {
         $result = [];
         foreach ($this->priceHistory as $itemId => $prices) {
-            if (!empty($prices)) {
+            if (count($prices) > 0) {
                 $result[] = ['itemId' => $itemId, 'price' => end($prices)];
             }
         }
