@@ -4,6 +4,8 @@ namespace Tests\Utils;
 
 use App\Utils\Logger;
 use Monolog\Logger as MonologLogger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\ErrorLogHandler;
 use PHPUnit\Framework\TestCase;
 
 class LoggerTest extends TestCase
@@ -13,6 +15,14 @@ class LoggerTest extends TestCase
         $logger = Logger::createLogger();
 
         $this->assertInstanceOf(MonologLogger::class, $logger);
-        $this->assertTrue($logger->getHandlers() !== []);
+
+        $handlers = $logger->getHandlers();
+        $this->assertCount(2, $handlers);
+
+        $handlerClasses = array_map(fn($handler) => get_class($handler), $handlers);
+        $this->assertContains(ErrorLogHandler::class, $handlerClasses);
+        $this->assertContains(StreamHandler::class, $handlerClasses);
+
+        $this->assertEquals('application', $logger->getName());
     }
 }

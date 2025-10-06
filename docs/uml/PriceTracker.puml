@@ -1,0 +1,14 @@
+@startuml
+
+class PriceTracker {
+    - array $priceHistory
+    + __construct()
+    + addPrice(string $itemId, float $price): void
+    + getPriceHistory(string $itemId): ?array
+    + getCurrentPrice(string $itemId): ?float
+    + getAveragePrice(string $itemId): ?float
+    + getPriceProjection(string $itemId, int $futurePeriods): ?float
+    + getPriceData(): array
+}
+
+@enduml
