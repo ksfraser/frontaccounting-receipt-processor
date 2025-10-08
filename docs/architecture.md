@@ -3,6 +3,14 @@
 ## Overview
 The Front Accounting Receipt Processor is designed to automate the conversion of PDF and JPG receipts into supplier invoices. The application leverages Optical Character Recognition (OCR) technology to extract relevant data from receipts, processes this data, and integrates with Front Accounting for invoice management.
 
+## Technology Stack
+- **Backend Logic**: PHP 8.3 with Composer for dependency management
+- **API Server**: Node.js with TypeScript and Express.js
+- **Testing**: PHPUnit for PHP, Jest for TypeScript
+- **OCR**: Tesseract OCR library
+- **Integration**: REST API client for Front Accounting
+- **File System**: Symfony Filesystem and Finder components
+
 ## Components
 
 ### 1. Ingestion

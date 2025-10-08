@@ -8,7 +8,7 @@ The Front Accounting Receipt Processor is designed to automate the processing of
 
 ### 1. Upload Receipt
 
-- **Endpoint:** `POST /api/receipts/upload`
+- **Endpoint:** `POST /upload`
 - **Description:** Uploads a new receipt for processing.
 - **Request Body:**
   - `file`: The receipt file (PDF or JPG).
@@ -16,48 +16,57 @@ The Front Accounting Receipt Processor is designed to automate the processing of
   - `200 OK`: Receipt uploaded successfully.
   - `400 Bad Request`: Invalid file type or missing file.
 
-### 2. Process Receipt
+### 2. Sync Supplier to FA
 
-- **Endpoint:** `POST /api/receipts/process`
-- **Description:** Processes the uploaded receipt and extracts data.
+- **Endpoint:** `POST /fa/supplier`
+- **Description:** Creates or updates a supplier in Front Accounting.
 - **Request Body:**
-  - `receiptId`: The ID of the uploaded receipt.
+  - Supplier data object
 - **Response:**
-  - `200 OK`: Receipt processed successfully, returns extracted data.
-  - `404 Not Found`: Receipt not found.
+  - `200 OK`: Supplier synced successfully.
+  - `500 Internal Server Error`: Sync failed.
 
-### 3. Create Supplier Invoice
+### 3. Sync Item to FA
 
-- **Endpoint:** `POST /api/invoices/create`
-- **Description:** Creates a new supplier invoice based on processed receipt data.
+- **Endpoint:** `POST /fa/item`
+- **Description:** Creates or updates an item in Front Accounting.
 - **Request Body:**
-  - `supplierId`: The ID of the supplier.
-  - `items`: Array of items extracted from the receipt.
+  - Item data object
 - **Response:**
-  - `201 Created`: Invoice created successfully.
-  - `400 Bad Request`: Invalid supplier ID or items.
+  - `200 OK`: Item synced successfully.
+  - `500 Internal Server Error`: Sync failed.
 
-### 4. Track Item Usage
+### 4. Get Item Prices from FA
 
-- **Endpoint:** `GET /api/items/usage`
-- **Description:** Retrieves usage statistics for items.
+- **Endpoint:** `GET /fa/item/:id/prices`
+- **Description:** Retrieves historical price data for a specific item from Front Accounting.
 - **Response:**
-  - `200 OK`: Returns usage data for items.
+  - `200 OK`: Returns price history.
+  - `500 Internal Server Error`: API call failed.
 
-### 5. Get Price History
+### 5. Get All Invoices from FA
 
-- **Endpoint:** `GET /api/items/:itemId/prices`
-- **Description:** Retrieves historical price data for a specific item.
+- **Endpoint:** `GET /fa/invoices`
+- **Description:** Retrieves all invoices from Front Accounting.
 - **Response:**
-  - `200 OK`: Returns price history for the item.
-  - `404 Not Found`: Item not found.
+  - `200 OK`: Returns invoices list.
+  - `500 Internal Server Error`: API call failed.
 
-### 6. Budget Estimation
+### 6. Get All Suppliers from FA
 
-- **Endpoint:** `GET /api/budget/estimate`
-- **Description:** Estimates budget entries based on usage and pricing data.
+- **Endpoint:** `GET /fa/suppliers`
+- **Description:** Retrieves all suppliers from Front Accounting.
 - **Response:**
-  - `200 OK`: Returns estimated budget data.
+  - `200 OK`: Returns suppliers list.
+  - `500 Internal Server Error`: API call failed.
+
+### 7. Get All Items from FA
+
+- **Endpoint:** `GET /fa/items`
+- **Description:** Retrieves all items from Front Accounting.
+- **Response:**
+  - `200 OK`: Returns items list.
+  - `500 Internal Server Error`: API call failed.
 
 ## Error Handling
 
