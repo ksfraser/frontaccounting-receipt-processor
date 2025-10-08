@@ -2,8 +2,7 @@
 
 namespace App\Ocr;
 
-use App\Utils\OcrError;
-use App\Ocr\OcrProvider;
+use App\Utils\Errors\OcrError;
 use Exception;
 
 /**
@@ -14,14 +13,14 @@ class OcrService
     /**
      * @var OcrProviderInterface OCR provider instance.
      */
-    private OcrProvider $provider;
+    private OcrProviderInterface $provider;
 
     /**
      * Constructor.
      *
      * @param OcrProviderInterface $provider OCR provider instance.
      */
-    public function __construct(OcrProvider $provider)
+    public function __construct(OcrProviderInterface $provider)
     {
         $this->provider = $provider;
     }
@@ -83,18 +82,4 @@ class OcrService
             throw new OcrError("OCR PDF processing failed: " . $e->getMessage());
         }
     }
-}
-
-/**
- * Interface for OCR provider.
- */
-interface OcrProvider
-{
-    /**
-     * Recognizes text from the given file.
-     *
-     * @param string $filePath Path to the file.
-     * @return string Recognized text.
-     */
-    public function recognize(string $filePath): string;
 }

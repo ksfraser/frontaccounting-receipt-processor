@@ -1,11 +1,17 @@
 <?php
 
+namespace Tests\Utils;
+
 use App\Utils\Errors\AppError;
+use PHPUnit\Framework\TestCase;
 
-function testManualInclude() {
-    $error = new AppError("Manual include test");
-    echo "Class loaded successfully: " . get_class($error) . PHP_EOL;
-    echo "Error name: " . $error->name . PHP_EOL;
+class ManualIncludeTest extends TestCase
+{
+    public function testManualInclude(): void
+    {
+        $error = new AppError("Manual include test");
+        $this->assertInstanceOf(AppError::class, $error);
+        $this->assertEquals("AppError", $error->name);
+        $this->assertEquals("Manual include test", $error->getMessage());
+    }
 }
-
-testManualInclude();

@@ -3,16 +3,19 @@
 namespace Tests\Ingestion;
 
 use App\Ingestion\UploadHandler;
+use App\Ingestion\FileSaver;
 use App\OCR\OcrService;
 use App\Parsing\ReceiptParser;
 use App\Integrations\FrontAccounting\FaClient;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 class UploadHandlerTest extends TestCase
 {
+    private MockObject $fileSaverMock;
     private $ocrServiceMock;
     private $receiptParserMock;
     private $faClientMock;
@@ -21,6 +24,7 @@ class UploadHandlerTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->fileSaverMock = $this->createMock(FileSaver::class);
         $this->ocrServiceMock = $this->createMock(OcrService::class);
         $this->receiptParserMock = $this->createMock(ReceiptParser::class);
         $this->faClientMock = $this->createMock(FaClient::class);
@@ -30,7 +34,8 @@ class UploadHandlerTest extends TestCase
             $this->ocrServiceMock,
             $this->receiptParserMock,
             $this->faClientMock,
-            $this->loggerMock
+            $this->loggerMock,
+            $this->fileSaverMock
         );
     }
 

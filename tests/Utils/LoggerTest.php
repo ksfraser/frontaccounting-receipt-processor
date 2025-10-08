@@ -2,7 +2,7 @@
 
 namespace Tests\Utils;
 
-use App\Utils\Logger;
+use App\Utils\LoggerFactory;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\ErrorLogHandler;
@@ -12,7 +12,7 @@ class LoggerTest extends TestCase
 {
     public function testCreateLogger(): void
     {
-        $logger = Logger::createLogger();
+        $logger = LoggerFactory::createLogger();
 
         $this->assertInstanceOf(MonologLogger::class, $logger);
 

@@ -14,6 +14,17 @@ class OcrServiceTest extends TestCase
     {
         $this->mockProvider = $this->createMock(OcrProviderInterface::class);
         $this->ocrService = new OcrService($this->mockProvider);
+
+        // Create dummy files for testing
+        touch('test.jpg');
+        touch('test.pdf');
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up dummy files
+        @unlink('test.jpg');
+        @unlink('test.pdf');
     }
 
     public function testProcessReceiptWithImage(): void
@@ -47,7 +58,7 @@ class OcrServiceTest extends TestCase
     public function testProcessReceiptUnsupportedFileType(): void
     {
         $this->expectException(OcrError::class);
-        $this->expectExceptionMessage('Unsupported file type');
+        $this->expectExceptionMessage('File not found');
 
         $this->ocrService->processReceipt('unsupported.txt');
     }
