@@ -1,7 +1,5 @@
 <?php
 
-require __DIR__ . '/../../src/Utils/Errors/Errors.php';
-
 use App\Utils\Errors\AppError;
 
 function testManualInclude() {

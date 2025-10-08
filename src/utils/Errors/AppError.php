@@ -7,18 +7,12 @@ use App\Utils\Errors\ErrorInterface;
 
 class AppError extends Exception implements ErrorInterface
 {
+    public $name = "AppError";
+
     public function __construct(string $message)
     {
         parent::__construct($message);
     }
 
-    public function getMessage(): string
-    {
-        return parent::getMessage();
-    }
-
-    public function getCode(): int
-    {
-        return parent::getCode();
-    }
+    // No additional methods are needed as Exception already provides the required functionality.
 }

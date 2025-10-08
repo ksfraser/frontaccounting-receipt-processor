@@ -6,6 +6,8 @@ use App\Utils\Errors\ErrorInterface;
 
 class ApiError extends AppError implements ErrorInterface
 {
+    public $name = "ApiError";
+
     public function __construct(string $message)
     {
         parent::__construct($message);

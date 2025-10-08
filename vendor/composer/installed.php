@@ -3,7 +3,7 @@
         'name' => 'frontaccounting/receipt-processor',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'acdb118b785e29d4dd1ac8f2273ac879d44613dc',
+        'reference' => '02ce7c2cf9e83a6b31670cf42bc67ddfeca5bfe8',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'frontaccounting/receipt-processor' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'acdb118b785e29d4dd1ac8f2273ac879d44613dc',
+            'reference' => '02ce7c2cf9e83a6b31670cf42bc67ddfeca5bfe8',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -339,6 +339,15 @@
             'install_path' => __DIR__ . '/../theseer/tokenizer',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'thiagoalessio/tesseract_ocr' => array(
+            'pretty_version' => '2.13.0',
+            'version' => '2.13.0.0',
+            'reference' => '232a8cb9d571992f9bd1e263f2f6909cf6c173a1',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../thiagoalessio/tesseract_ocr',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
     ),
 );
