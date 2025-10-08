@@ -6,7 +6,6 @@ use App\Ingestion\UploadHandler;
 use App\Ingestion\FileSaver;
 use App\OCR\OcrService;
 use App\Parsing\ReceiptParser;
-use App\Integrations\FrontAccounting\FaClient;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -18,7 +17,6 @@ class UploadHandlerTest extends TestCase
     private MockObject $fileSaverMock;
     private $ocrServiceMock;
     private $receiptParserMock;
-    private $faClientMock;
     private $loggerMock;
     private $uploadHandler;
 
@@ -27,15 +25,13 @@ class UploadHandlerTest extends TestCase
         $this->fileSaverMock = $this->createMock(FileSaver::class);
         $this->ocrServiceMock = $this->createMock(OcrService::class);
         $this->receiptParserMock = $this->createMock(ReceiptParser::class);
-        $this->faClientMock = $this->createMock(FaClient::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
 
         $this->uploadHandler = new UploadHandler(
             $this->ocrServiceMock,
             $this->receiptParserMock,
-            $this->faClientMock,
-            $this->loggerMock,
-            $this->fileSaverMock
+            $this->fileSaverMock,
+            $this->loggerMock
         );
     }
 
@@ -55,8 +51,7 @@ class UploadHandlerTest extends TestCase
             'date' => '2025-10-05',
         ]);
 
-        $this->faClientMock->method('createInvoice')->willReturn(['id' => 123]);
-        $this->faClientMock->method('attachFileToInvoice')->willReturn(['status' => 'success']);
+        $this->fileSaverMock->method('saveFile')->willReturn('path/to/saved/file');
 
         $response = $this->uploadHandler->handleUpload($uploadedFile);
 

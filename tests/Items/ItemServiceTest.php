@@ -3,7 +3,7 @@
 namespace Tests\Items;
 
 use App\Items\ItemService;
-use App\Utils\Errors\AppError;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ItemServiceTest extends TestCase
@@ -28,7 +28,7 @@ class ItemServiceTest extends TestCase
 
     public function testCreateDuplicateItem(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item already exists');
 
         $this->itemService->createItem('item1', 'Item 1', 10.0);
@@ -47,7 +47,7 @@ class ItemServiceTest extends TestCase
 
     public function testUpdateNonExistentItem(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item not found');
 
         $this->itemService->updateItem('item1', 'Updated Item 1', 15.0);
@@ -64,7 +64,7 @@ class ItemServiceTest extends TestCase
 
     public function testTrackUsageNonExistentItem(): void
     {
-        $this->expectException(AppError::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item not found');
 
         $this->itemService->trackUsage('item1', 5);

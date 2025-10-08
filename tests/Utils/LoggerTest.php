@@ -12,15 +12,16 @@ class LoggerTest extends TestCase
 {
     public function testCreateLogger(): void
     {
-        $logger = LoggerFactory::createLogger();
+        $logFile = __DIR__ . '/test.log';
+        $loggerFactory = new LoggerFactory($logFile);
+        $logger = $loggerFactory->createLogger('application');
 
         $this->assertInstanceOf(MonologLogger::class, $logger);
 
         $handlers = $logger->getHandlers();
-        $this->assertCount(2, $handlers);
+        $this->assertCount(1, $handlers);
 
         $handlerClasses = array_map(fn($handler) => get_class($handler), $handlers);
-        $this->assertContains(ErrorLogHandler::class, $handlerClasses);
         $this->assertContains(StreamHandler::class, $handlerClasses);
 
         $this->assertEquals('application', $logger->getName());

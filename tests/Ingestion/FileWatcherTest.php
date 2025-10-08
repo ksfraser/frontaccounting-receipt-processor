@@ -3,7 +3,7 @@
 namespace Tests\Ingestion;
 
 use App\Ingestion\FileWatcher;
-use App\OCR\OcrService;
+use App\OCR\OcrProviderInterface;
 use App\Parsing\ReceiptParser;
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
@@ -11,17 +11,17 @@ use org\bovigo\vfs\vfsStream;
 class FileWatcherTest extends TestCase
 {
     private FileWatcher $fileWatcher;
-    private OcrService $mockOcrService;
+    private OcrProviderInterface $mockOcrProvider;
     private ReceiptParser $mockReceiptParser;
     private $vfsRoot;
 
     protected function setUp(): void
     {
-        $this->mockOcrService = $this->createMock(OcrService::class);
+        $this->mockOcrProvider = $this->createMock(OcrProviderInterface::class);
         $this->mockReceiptParser = $this->createMock(ReceiptParser::class);
 
         $this->vfsRoot = vfsStream::setup('receiptsDir');
-        $this->fileWatcher = new FileWatcher($this->vfsRoot->url(), $this->mockOcrService, $this->mockReceiptParser);
+        $this->fileWatcher = new FileWatcher($this->mockOcrProvider, $this->vfsRoot->url(), $this->mockReceiptParser);
     }
 
     public function testStartWithValidFiles(): void
@@ -29,7 +29,7 @@ class FileWatcherTest extends TestCase
         $fileContent = 'dummy content';
         $parsedData = ['supplier' => 'Test Supplier', 'items' => []];
 
-        $this->mockOcrService->method('processReceipt')->willReturn($fileContent);
+        $this->mockOcrProvider->method('recognize')->willReturn($fileContent);
         $this->mockReceiptParser->method('parse')->willReturn($parsedData);
 
         vfsStream::newFile('receipt1.jpg')->at($this->vfsRoot);
@@ -44,10 +44,10 @@ class FileWatcherTest extends TestCase
 
     public function testStartWithNoDirectory(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Receipts directory does not exist');
 
-        $invalidWatcher = new FileWatcher('/invalid/path', $this->mockOcrService, $this->mockReceiptParser);
+        $invalidWatcher = new FileWatcher($this->mockOcrProvider, '/invalid/path', $this->mockReceiptParser);
         $invalidWatcher->start();
     }
 }
