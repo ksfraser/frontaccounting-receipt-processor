@@ -4,33 +4,33 @@ namespace App\Ingestion;
 
 use App\OCR\OcrService;
 use App\Parsing\ReceiptParser;
-use App\Integrations\FrontAccounting\FaClient;
-use App\Utils\Errors\FileUploadError;
-use App\Utils\Errors\ApiError;
-use App\Utils\Errors\ParsingError;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 class UploadHandler
 {
     private OcrService $ocrService;
     private ReceiptParser $receiptParser;
-    private FaClient $faClient;
-    private LoggerInterface $logger;
+    private FileSaver $fileSaver;
+    private InvoiceProcessor $invoiceProcessor;
 
-    public function __construct(OcrService $ocrService, ReceiptParser $receiptParser, FaClient $faClient, LoggerInterface $logger)
-    {
+    public function __construct(
+        OcrService $ocrService,
+        ReceiptParser $receiptParser,
+        FileSaver $fileSaver,
+        InvoiceProcessor $invoiceProcessor
+    ) {
         $this->ocrService = $ocrService;
         $this->receiptParser = $receiptParser;
-        $this->faClient = $faClient;
-        $this->logger = $logger;
+        $this->fileSaver = $fileSaver;
+        $this->invoiceProcessor = $invoiceProcessor;
     }
 
     public function handleUpload(UploadedFile $file): Response
     {
         try {
-            $filePath = $this->saveFile($file);
+            $filePath = $this->fileSaver->saveFile($file);
             $text = $this->ocrService->processReceipt($filePath);
             $parsed = $this->receiptParser->parse($text);
 
@@ -47,8 +47,8 @@ class UploadHandler
                 'date' => $parsed['date'],
             ];
 
-            $faResult = $this->faClient->createInvoice($invoicePayload);
-            $attachmentResult = $this->attachFileToInvoice($faResult['id'] ?? null, $filePath);
+            $faResult = $this->invoiceProcessor->createInvoice($invoicePayload);
+            $attachmentResult = $this->invoiceProcessor->attachFileToInvoice($faResult['id'] ?? null, $filePath);
 
             return new Response(json_encode([
                 'message' => 'File processed and synced',
@@ -56,36 +56,8 @@ class UploadHandler
                 'faResult' => $faResult,
                 'attachmentResult' => $attachmentResult,
             ]), Response::HTTP_OK, ['Content-Type' => 'application/json']);
-        } catch (FileUploadError | ApiError | ParsingError $e) {
-            $this->logger->error($e->getMessage(), ['exception' => $e]);
-            return new Response(json_encode(['message' => $e->getMessage()]), Response::HTTP_INTERNAL_SERVER_ERROR, ['Content-Type' => 'application/json']);
-        }
-    }
-
-    private function saveFile(UploadedFile $file): string
-    {
-        $uploadDir = __DIR__ . '/../../uploads';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        $filePath = $uploadDir . '/' . time() . '-' . $file->getClientOriginalName();
-        $file->move($uploadDir, basename($filePath));
-
-        return $filePath;
-    }
-
-    private function attachFileToInvoice(?string $invoiceId, string $filePath): ?array
-    {
-        if ($invoiceId === null) {
-            return null;
-        }
-
-        try {
-            return $this->faClient->attachFileToInvoice($invoiceId, $filePath);
         } catch (\Exception $e) {
-            $this->logger->error('Failed to attach file to invoice', ['exception' => $e]);
-            return ['error' => $e->getMessage()];
+            return new Response(json_encode(['message' => $e->getMessage()]), Response::HTTP_INTERNAL_SERVER_ERROR, ['Content-Type' => 'application/json']);
         }
     }
 }

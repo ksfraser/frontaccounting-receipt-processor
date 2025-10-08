@@ -17,5 +17,6 @@ return array(
     'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
+    'App\\Utils\\Errors\\' => array($baseDir . '/src/Utils/Errors'),
     'App\\' => array($baseDir . '/src'),
 );

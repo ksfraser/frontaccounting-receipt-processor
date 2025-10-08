@@ -8,7 +8,20 @@ class FileWatcher {
     + start(): void
 }
 
+interface FileStorageInterface {
+    + saveFile(file: UploadedFile): string
+}
+
+class FileSaver {
+    - string $uploadDir
+    - LoggerInterface $logger
+    + __construct(string $uploadDir, LoggerInterface $logger)
+    + saveFile(file: UploadedFile): string
+}
+
+FileSaver ..|> FileStorageInterface
 FileWatcher --> OcrService
 FileWatcher --> ReceiptParser
+FileWatcher --> FileSaver
 
 @enduml
