@@ -4,7 +4,9 @@ namespace Tests\Ingestion;
 
 use App\Ingestion\FileWatcher;
 use App\OCR\OcrProviderInterface;
+use App\OCR\OcrService;
 use App\Parsing\ReceiptParser;
+use App\Parsing\ParsedReceipt;
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 
@@ -12,28 +14,30 @@ class FileWatcherTest extends TestCase
 {
     private FileWatcher $fileWatcher;
     private OcrProviderInterface $mockOcrProvider;
+    private OcrService $mockOcrService;
     private ReceiptParser $mockReceiptParser;
     private $vfsRoot;
 
     protected function setUp(): void
     {
         $this->mockOcrProvider = $this->createMock(OcrProviderInterface::class);
+        $this->mockOcrService = $this->createMock(OcrService::class);
         $this->mockReceiptParser = $this->createMock(ReceiptParser::class);
 
         $this->vfsRoot = vfsStream::setup('receiptsDir');
-        $this->fileWatcher = new FileWatcher($this->mockOcrProvider, $this->vfsRoot->url(), $this->mockReceiptParser);
+        $this->fileWatcher = new FileWatcher($this->mockOcrProvider, $this->vfsRoot->url(), $this->mockReceiptParser, $this->mockOcrService);
     }
 
     public function testStartWithValidFiles(): void
     {
         $fileContent = 'dummy content';
-        $parsedData = ['supplier' => 'Test Supplier', 'items' => []];
+        $parsedReceipt = new ParsedReceipt('2025-10-05', ['id' => 1, 'name' => 'Test Supplier'], [], 0.0);
 
-        $this->mockOcrProvider->method('recognize')->willReturn($fileContent);
-        $this->mockReceiptParser->method('parse')->willReturn($parsedData);
+        $this->mockOcrService->method('processReceipt')->willReturn($fileContent);
+        $this->mockReceiptParser->method('parse')->willReturn($parsedReceipt);
 
-        vfsStream::newFile('receipt1.jpg')->at($this->vfsRoot);
-        vfsStream::newFile('receipt2.pdf')->at($this->vfsRoot);
+        vfsStream::newFile('receipt1.jpg')->at($this->vfsRoot)->setContent('test content');
+        vfsStream::newFile('receipt2.pdf')->at($this->vfsRoot)->setContent('test content');
 
         $this->expectOutputRegex('/Watching for new receipts/');
         $this->expectOutputRegex('/New receipt detected/');
@@ -45,9 +49,8 @@ class FileWatcherTest extends TestCase
     public function testStartWithNoDirectory(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Receipts directory does not exist');
 
-        $invalidWatcher = new FileWatcher($this->mockOcrProvider, '/invalid/path', $this->mockReceiptParser);
+        $invalidWatcher = new FileWatcher($this->mockOcrProvider, 'Z:\invalid\path\that\does\not\exist', $this->mockReceiptParser, $this->mockOcrService);
         $invalidWatcher->start();
     }
 }

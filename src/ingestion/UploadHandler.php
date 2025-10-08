@@ -35,16 +35,16 @@ class UploadHandler
             $parsed = $this->receiptParser->parse($text);
 
             $invoicePayload = [
-                'supplierId' => $parsed['supplier']['id'],
+                'supplierId' => $parsed->supplier['id'],
                 'items' => array_map(function ($item) {
                     return [
-                        'itemId' => $item['id'],
-                        'quantity' => $item['quantity'],
-                        'price' => $item['price'],
+                        'itemId' => $item->description, // Using description as itemId for now
+                        'quantity' => $item->quantity,
+                        'price' => $item->unitPrice,
                     ];
-                }, $parsed['items']),
-                'totalAmount' => $parsed['totalAmount'],
-                'date' => $parsed['date'],
+                }, $parsed->items),
+                'totalAmount' => $parsed->totalAmount,
+                'date' => $parsed->date,
             ];
 
             $faResult = $this->invoiceProcessor->createInvoice($invoicePayload);

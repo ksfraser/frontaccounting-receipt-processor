@@ -5,6 +5,7 @@ namespace Tests\Suppliers;
 use App\Models\Supplier;
 use App\Suppliers\SupplierService;
 use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 
 class SupplierServiceTest extends TestCase
 {

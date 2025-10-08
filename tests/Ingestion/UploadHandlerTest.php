@@ -4,8 +4,11 @@ namespace Tests\Ingestion;
 
 use App\Ingestion\UploadHandler;
 use App\Ingestion\FileSaver;
+use App\Ingestion\InvoiceProcessor;
 use App\OCR\OcrService;
 use App\Parsing\ReceiptParser;
+use App\Parsing\ParsedReceipt;
+use App\Parsing\ParsedItem;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -17,7 +20,7 @@ class UploadHandlerTest extends TestCase
     private MockObject $fileSaverMock;
     private $ocrServiceMock;
     private $receiptParserMock;
-    private $loggerMock;
+    private $invoiceProcessorMock;
     private $uploadHandler;
 
     protected function setUp(): void
@@ -25,13 +28,13 @@ class UploadHandlerTest extends TestCase
         $this->fileSaverMock = $this->createMock(FileSaver::class);
         $this->ocrServiceMock = $this->createMock(OcrService::class);
         $this->receiptParserMock = $this->createMock(ReceiptParser::class);
-        $this->loggerMock = $this->createMock(LoggerInterface::class);
+        $this->invoiceProcessorMock = $this->createMock(InvoiceProcessor::class);
 
         $this->uploadHandler = new UploadHandler(
             $this->ocrServiceMock,
             $this->receiptParserMock,
             $this->fileSaverMock,
-            $this->loggerMock
+            $this->invoiceProcessorMock
         );
     }
 
@@ -42,16 +45,18 @@ class UploadHandlerTest extends TestCase
         $uploadedFile->method('move')->willReturn(null);
 
         $this->ocrServiceMock->method('processReceipt')->willReturn('Sample OCR Text');
-        $this->receiptParserMock->method('parse')->willReturn([
-            'supplier' => ['id' => 1],
-            'items' => [
-                ['id' => 101, 'quantity' => 2, 'price' => 50.0],
-            ],
-            'totalAmount' => 100.0,
-            'date' => '2025-10-05',
-        ]);
+        $parsedReceipt = new ParsedReceipt(
+            '2025-10-05',
+            ['id' => 1, 'name' => 'Test Supplier'],
+            [new ParsedItem('Test Item', 50.0, 2)],
+            100.0
+        );
+        $this->receiptParserMock->method('parse')->willReturn($parsedReceipt);
 
         $this->fileSaverMock->method('saveFile')->willReturn('path/to/saved/file');
+
+        $this->invoiceProcessorMock->method('createInvoice')->willReturn(['id' => 'invoice123']);
+        $this->invoiceProcessorMock->method('attachFileToInvoice')->willReturn(['success' => true]);
 
         $response = $this->uploadHandler->handleUpload($uploadedFile);
 
@@ -64,14 +69,13 @@ class UploadHandlerTest extends TestCase
     {
         $uploadedFile = $this->createMock(UploadedFile::class);
         $uploadedFile->method('getClientOriginalName')->willReturn('receipt.jpg');
-        $uploadedFile->method('move')->willThrowException(new \Exception('File move error'));
 
-        $this->loggerMock->expects($this->once())->method('error');
+        $this->fileSaverMock->method('saveFile')->willThrowException(new \Exception('File save error'));
 
         $response = $this->uploadHandler->handleUpload($uploadedFile);
 
         $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         $responseData = json_decode($response->getContent(), true);
-        $this->assertEquals('File move error', $responseData['message']);
+        $this->assertEquals('File save error', $responseData['message']);
     }
 }

@@ -15,11 +15,11 @@ class FileWatcher
     private ReceiptParser $parser;
     private string $receiptsDir;
 
-    public function __construct(OcrProviderInterface $provider)
+    public function __construct(OcrProviderInterface $provider, ?string $receiptsDir = null, ?ReceiptParser $parser = null, ?OcrService $ocr = null)
     {
-        $this->ocr = new OcrService($provider);
-        $this->parser = new ReceiptParser();
-        $this->receiptsDir = __DIR__ . '/../../receipts';
+        $this->ocr = $ocr ?? new OcrService($provider);
+        $this->parser = $parser ?? new ReceiptParser();
+        $this->receiptsDir = $receiptsDir ?? __DIR__ . '/../../receipts';
 
         // Ensure the directory exists
         if (!is_dir($this->receiptsDir)) {

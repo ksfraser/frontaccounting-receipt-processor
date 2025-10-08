@@ -6,6 +6,13 @@ use App\Utils\Errors\OcrError;
 
 class TesseractProvider
 {
+    private $tesseractInstance;
+
+    public function setTesseractInstance($instance): void
+    {
+        $this->tesseractInstance = $instance;
+    }
+
     public function recognizeImage(string $imagePath): string
     {
         try {

@@ -15,7 +15,7 @@ class FileWatcherTest extends TestCase
     {
         $ocrProviderMock = $this->createMock(OcrProviderInterface::class);
         $this->fileWatcher = new FileWatcher($ocrProviderMock);
-        $this->receiptsDir = __DIR__ . '/../../receipts';
+        $this->receiptsDir = dirname(__DIR__, 3) . '/receipts';
     }
 
     protected function tearDown(): void
@@ -32,7 +32,9 @@ class FileWatcherTest extends TestCase
             rmdir($this->receiptsDir);
         }
 
-        $this->fileWatcher->start();
+        // Create FileWatcher after removing directory
+        $ocrProviderMock = $this->createMock(OcrProviderInterface::class);
+        $fileWatcher = new FileWatcher($ocrProviderMock);
 
         $this->assertTrue(is_dir($this->receiptsDir), 'Receipts directory should be created.');
     }

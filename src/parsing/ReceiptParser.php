@@ -2,18 +2,16 @@
 
 namespace App\Parsing;
 
+use App\Parsing\ParsedReceipt;
+use App\Parsing\ParsedItem;
+
 class ReceiptParser
 {
-    public function parse(string $ocrOutput): array
+    public function parse(string $ocrOutput): ParsedReceipt
     {
         $normalized = trim($ocrOutput);
         if (empty($normalized)) {
-            return [
-                'supplier' => ['id' => 1, 'name' => '', 'address' => '', 'contactInfo' => ''],
-                'date' => '',
-                'items' => [],
-                'totalAmount' => 0
-            ];
+            throw new \Exception('OCR output is empty');
         }
 
         preg_match('/Supplier:\s*(.+)/i', $normalized, $supplierMatch);
@@ -38,20 +36,16 @@ class ReceiptParser
                 return null;
             }
             if (preg_match('/-\s*(.+?):\s*\$?(\d+\.?\d*)/', $line, $m)) {
-                return ['id' => $idx + 1, 'name' => trim($m[1]), 'quantity' => 1, 'price' => (float)$m[2]];
+                return new ParsedItem(trim($m[1]), (float)$m[2], 1);
             }
             return null;
         }, $itemsRaw, array_keys($itemsRaw)));
+        $items = array_values($items); // Reindex the array
 
         $totalAmount = array_reduce($items, function ($sum, $item) {
-            return $sum + $item['price'] * $item['quantity'];
+            return $sum + $item->unitPrice * $item->quantity;
         }, 0);
 
-        return [
-            'supplier' => $supplier,
-            'date' => $dateMatch[1],
-            'items' => $items,
-            'totalAmount' => $totalAmount
-        ];
+        return new ParsedReceipt($dateMatch[1], $supplier, $items, $totalAmount);
     }
 }

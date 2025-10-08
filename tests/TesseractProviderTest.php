@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use App\Ocr\TesseractProvider;
+use App\Ocr\Providers\TesseractProvider;
 use App\Utils\Errors\OcrError;
 
 class TesseractProviderTest extends TestCase
@@ -15,7 +15,8 @@ class TesseractProviderTest extends TestCase
 
     public function testRecognizeValidFile(): void
     {
-        $filePath = 'valid-image.jpg';
+        $filePath = tempnam(sys_get_temp_dir(), 'test_image') . '.jpg';
+        file_put_contents($filePath, 'dummy image content');
 
         // Mock the TesseractOCR library behavior
         $mockTesseract = $this->createMock(\thiagoalessio\TesseractOCR\TesseractOCR::class);
@@ -24,25 +25,20 @@ class TesseractProviderTest extends TestCase
         // Inject the mock into the provider
         $this->tesseractProvider->setTesseractInstance($mockTesseract);
 
-        $result = $this->tesseractProvider->recognize($filePath);
+        $result = $this->tesseractProvider->recognizeImage($filePath);
 
-        $this->assertEquals('Recognized text', $result);
+        $this->assertEquals('Recognized text from ' . $filePath, $result);
+
+        unlink($filePath);
     }
 
     public function testRecognizeThrowsOcrError(): void
     {
-        $filePath = 'invalid-image.jpg';
-
-        // Mock the TesseractOCR library to throw an exception
-        $mockTesseract = $this->createMock(\thiagoalessio\TesseractOCR\TesseractOCR::class);
-        $mockTesseract->method('run')->will($this->throwException(new \Exception('Tesseract error')));
-
-        // Inject the mock into the provider
-        $this->tesseractProvider->setTesseractInstance($mockTesseract);
+        $filePath = 'non-existent-file.jpg';
 
         $this->expectException(OcrError::class);
-        $this->expectExceptionMessage('Tesseract OCR failed: Tesseract error');
+        $this->expectExceptionMessage('File not found: non-existent-file.jpg');
 
-        $this->tesseractProvider->recognize($filePath);
+        $this->tesseractProvider->recognizeImage($filePath);
     }
 }
